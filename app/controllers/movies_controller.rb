@@ -7,12 +7,14 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings = Movie.all_ratings()
     @sortBy = params[:sort_by]
+    @ratings = params[:ratings].nil? ? @all_ratings : params[:ratings]
     @movies = 
       if @sortBy.nil?
-        Movie.all()
+        Movie.all(:conditions => { :rating => @ratings.keys})
       else
-        Movie.all(:order => @sortBy + " ASC")
+        Movie.all(:order => @sortBy + " ASC", :conditions => { :rating => @ratings.keys})
       end
   end
 
