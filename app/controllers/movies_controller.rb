@@ -8,17 +8,28 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings()
-    unless params[:sort_by]
-       params[:sort_by] = "id"
-    end
     @sortBy = params[:sort_by]
-    @ratings = params[:ratings].nil? ? @all_ratings : params[:ratings]
-    @movies = 
-      if @sortBy.nil?
-        Movie.all(:conditions => { :rating => @ratings.keys})
-      else
-        Movie.all(:order => @sortBy + " ASC", :conditions => { :rating => @ratings.keys})
-      end
+    @ratings = params[:ratings]
+
+    if @ratings.nil?
+      @ratings = session[:ratings] || @all_ratings
+      should_redirect = true
+    else
+      session[:ratings] = @ratings
+    end
+    
+    if @sortBy.nil?
+      @sortBy = session[:sort_by] || :id
+      should_redirect = true
+    else
+      session[:sort_by] = @sortBy
+    end
+
+    if should_redirect
+      redirect_to movies_path(:ratings => @ratings, :sort_by => @sortBy)
+    else
+      @movies = Movie.all(:order => @sortBy + " ASC", :conditions => { :rating => @ratings.keys})
+    end
   end
 
   def new
