@@ -8,6 +8,9 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings()
+    unless params[:sort_by]
+       params[:sort_by] = "id"
+    end
     @sortBy = params[:sort_by]
     @ratings = params[:ratings].nil? ? @all_ratings : params[:ratings]
     @movies = 
